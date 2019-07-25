@@ -48,6 +48,7 @@ On Wednesday night it had rained very heavily, the lane was wet and muddy, but t
 It hadn’t properly registered yet with Arthur that the council wanted to knock it down and build a bypass instead.`);
 console.log("My Chain:", myMarkovChain);
 
+
 let myText = generateText(myMarkovChain, 30);
 console.log("Generated Text: " + myText);
 
