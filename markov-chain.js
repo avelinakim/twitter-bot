@@ -40,10 +40,4 @@ export function generateText(markovChain, numberWords) {
   return newText;
 }
 
-//let myMarkovChain = generateMarkovChain(text);
-//console.log("My Chain:", myMarkovChain);
-
-
-//let generatedText = generateText(myMarkovChain, 30);
-//console.log("Generated Text: " + generatedText);
 

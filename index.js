@@ -13,15 +13,13 @@ const client = new Twitter({
 });
 
 const params = {
-  q: 'from:realdonaldtrump',
+  q: 'from:cigneutron',
   tweet_mode: 'extended'
 };
 
 client.get('search/tweets', params, (error, tweetsObj, response) => {
   if (!error) {
-    let tweetData = fs.readFileSync('text-data.json', 'utf8');
-    tweetData = JSON.parse(tweetData)
-    console.log("STARTING DATA: ", tweetData);
+    let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
     let tweetsArr = tweetsObj.statuses;
     for (let tweet of tweetsArr) {
       if (!tweet.retweeted_status) {
@@ -34,14 +32,29 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
         }
       }
     }
-    fs.writeFileSync('text-data.json', JSON.stringify(tweetData), 'utf8');
-    console.log("UPDATED DATA:", tweetData);
+    fs.writeFileSync('text-data.json', JSON.stringify(tweetData, null, 2), 'utf8');
   } else {
     console.log('ERROR', error)
   }
 });
 
+function createTweet() {
+  let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
+  let tweetText = tweetData.reduce((string, textObj) => {
+    string += textObj.text + " ";
+    return string;
+  }, "");
+  let markovChain = generateMarkovChain(tweetText);
+  let generatedTweet = generateText(markovChain, 10);
+  return generatedTweet;
+}
 
-// let markovChain = generateMarkovChain(tweetText);
-// let generatedText = generateText(markovChain, 20);
-// console.log("TEXT: " + generatedText); 
+function postTweet() {
+  client.post('statuses/update', { status: createTweet() }, (error, tweet, response) => {
+    if (error) throw error;
+    console.log(tweet);
+  });
+}
+
+//console.log(createTweet()); 
+postTweet();  
