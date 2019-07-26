@@ -1,4 +1,4 @@
-import text from "./text-data.js"
+
 
 function prepareText(text) {
   let preparedText = text.replace(/\.\.\./g, " ...");

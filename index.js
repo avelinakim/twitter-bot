@@ -1,6 +1,7 @@
 import Twitter from 'twitter';
 import dotenv from 'dotenv';
 import { generateMarkovChain, generateText } from "./markov-chain.js"
+import * as fs from 'fs';
 
 dotenv.config()
 
@@ -16,24 +17,31 @@ const params = {
   tweet_mode: 'extended'
 };
 
-let tweetText = "";
-
 client.get('search/tweets', params, (error, tweetsObj, response) => {
   if (!error) {
+    let tweetData = fs.readFileSync('text-data.json', 'utf8');
+    tweetData = JSON.parse(tweetData)
+    console.log("STARTING DATA: ", tweetData);
     let tweetsArr = tweetsObj.statuses;
     for (let tweet of tweetsArr) {
       if (!tweet.retweeted_status) {
-        tweetText += tweet.full_text + " ";
+        let tweetText = tweet.full_text + " ";
+        let tweetID = tweet.id;
+        let tweetNotInData = tweetData.every((tweetObj) => tweetObj.id !== tweetID);
+        if (tweetNotInData) {
+          let newTweetObj = { text: tweetText, id: tweetID };
+          tweetData.push(newTweetObj);
+        }
       }
     }
-    console.log("IN GET" + tweetText);
+    fs.writeFileSync('text-data.json', JSON.stringify(tweetData), 'utf8');
+    console.log("UPDATED DATA:", tweetData);
   } else {
     console.log('ERROR', error)
   }
 });
 
-// console.log("TWEET TEXT" + tweetText);
+
 // let markovChain = generateMarkovChain(tweetText);
 // let generatedText = generateText(markovChain, 20);
-
 // console.log("TEXT: " + generatedText); 
