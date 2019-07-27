@@ -1,4 +1,5 @@
-
+import emojiRegex from 'emoji-regex'
+const eRegex = emojiRegex();
 
 function prepareText(text) {
   let preparedText = text.replace(/\.\.\./g, " ...");
@@ -29,26 +30,27 @@ export function generateMarkovChain(text, startWordsArr) {
     ...markovChain['!'],
     ...markovChain['?'],
   ]
+  console.log("MarkovChain:", markovChain);
   return markovChain;
 }
 
 export function generateText(markovChain, numberWords) {
-  let probability = [1, 2, 2, 2, 3, 3];
+  let probability = [1, 2, 2, 2, 2, 3];
   let counter = probability[Math.floor(Math.random() * probability.length)];
   console.log(counter);
   let newText = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
   let lastWord = newText;
   let i = 1;
   while (i < numberWords) {
-    if (/[\.\?\!\#]/.test(lastWord)) {
+    if (/[\.\?\!\#]/.test(lastWord) || eRegex.test(lastWord)) {
       counter--;
-      console.log("Counter: " + counter);
+      console.log("Counter: ", counter + " LastWord:", lastWord);
       if (counter <= 0) return newText;
     }
     let lastWordArr = markovChain[lastWord];
     let nextWord = lastWordArr[Math.floor(Math.random() * lastWordArr.length)];
     let space = "";
-    if ((nextWord) && ![".", ",", "!", "...", "?"].includes(nextWord[0])) space = " ";
+    if ((nextWord) && ![".", ",", "!", "...", "?", ":"].includes(nextWord[0])) space = " ";
     newText = newText.concat(space + nextWord);
     lastWord = nextWord;
     i++;
