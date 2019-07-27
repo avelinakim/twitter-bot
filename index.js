@@ -22,7 +22,7 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
     let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
     let tweetsArr = tweetsObj.statuses;
     for (let tweet of tweetsArr) {
-      if (!tweet.retweeted_status) {
+      if (!tweet.retweeted_status && !tweet.in_reply_to_status_id) {
         let tweetText = tweet.full_text + " ";
         let tweetID = tweet.id;
         let tweetNotInData = tweetData.every((tweetObj) => tweetObj.id !== tweetID);
@@ -38,14 +38,16 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
   }
 });
 
+let startWords = [];
 function createTweet() {
+  startWords = [];
   let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
   let tweetText = tweetData.reduce((string, textObj) => {
-    string += textObj.text + " ";
-    return string;
+    startWords.push((textObj.text).split(" ")[0]);
+    return string + textObj.text + " ";
   }, "");
-  let markovChain = generateMarkovChain(tweetText);
-  let generatedTweet = generateText(markovChain, 10);
+  let markovChain = generateMarkovChain(tweetText, startWords);
+  let generatedTweet = generateText(markovChain, 25);
   return generatedTweet;
 }
 
@@ -56,5 +58,5 @@ function postTweet() {
   });
 }
 
-//console.log(createTweet()); 
-postTweet();  
+console.log(createTweet());
+//postTweet();

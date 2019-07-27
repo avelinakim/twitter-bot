@@ -5,13 +5,15 @@ function prepareText(text) {
   preparedText = preparedText.replace(/([^\.])\. /g, '$1 . ');
   preparedText = preparedText.replace(/([\.\?\!\:\"])$/g, ' $1');
   preparedText = preparedText.replace(/([\,\.\?\!\:\"])(\s+)/g, ' $1$2');
+  preparedText = preparedText.replace(/[@"()]/g, '');
   return preparedText;
 }
 
-export function generateMarkovChain(text) {
+export function generateMarkovChain(text, startWordsArr) {
   let preppedText = prepareText(text);
-  const textArr = preppedText.split(/\s+/g);
-  const markovChain = {};
+  const markovChain = { startWords: [] };
+  let textArr = preppedText.split(/\s+/g);
+  textArr = textArr.filter((word) => word !== '');
 
   for (let i = 0; i < textArr.length; i++) {
     let word = textArr[i];
@@ -21,14 +23,28 @@ export function generateMarkovChain(text) {
       markovChain[word].push(nextWord);
     }
   }
+  markovChain.startWords = [
+    ...markovChain.startWords,
+    ...markovChain['.'],
+    ...markovChain['!'],
+    ...markovChain['?'],
+  ]
   return markovChain;
 }
 
 export function generateText(markovChain, numberWords) {
-  let newText = markovChain['.'][Math.floor(Math.random() * markovChain['.'].length)];
+  let probability = [1, 2, 2, 2, 3, 3];
+  let counter = probability[Math.floor(Math.random() * probability.length)];
+  console.log(counter);
+  let newText = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
   let lastWord = newText;
   let i = 1;
   while (i < numberWords) {
+    if (/[\.\?\!\#]/.test(lastWord)) {
+      counter--;
+      console.log("Counter: " + counter);
+      if (counter <= 0) return newText;
+    }
     let lastWordArr = markovChain[lastWord];
     let nextWord = lastWordArr[Math.floor(Math.random() * lastWordArr.length)];
     let space = "";
