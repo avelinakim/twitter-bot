@@ -47,14 +47,14 @@ function createTweet() {
     return string + textObj.text + " ";
   }, "");
   let markovChain = generateMarkovChain(tweetText, startWords);
-  let generatedTweet = generateText(markovChain, 25);
+  let generatedTweet = generateText(markovChain);
   return generatedTweet;
 }
 
 function postTweet() {
   client.post('statuses/update', { status: createTweet() }, (error, tweet, response) => {
     if (error) throw error;
-    console.log(tweet);
+    console.log(tweet.text);
   });
 }
 

@@ -7,6 +7,7 @@ function prepareText(text) {
   preparedText = preparedText.replace(/([\.\?\!\:\"])$/g, ' $1');
   preparedText = preparedText.replace(/([\,\.\?\!\:\"])(\s+)/g, ' $1$2');
   preparedText = preparedText.replace(/[@"()]/g, '');
+  preparedText = preparedText.replace(/&amp;/g, ' & ');
   return preparedText;
 }
 
@@ -34,28 +35,46 @@ export function generateMarkovChain(text, startWordsArr) {
   return markovChain;
 }
 
-export function generateText(markovChain, numberWords) {
-  let probability = [1, 2, 2, 2, 2, 3];
-  let counter = probability[Math.floor(Math.random() * probability.length)];
-  console.log(counter);
-  let newText = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
-  let lastWord = newText;
-  let i = 1;
-  while (i < numberWords) {
+export function generateText(markovChain) {
+  let probability = [1, 1, 2, 2, 2, 3];
+  let ideaCounter = probability[Math.floor(Math.random() * probability.length)];
+  console.log(ideaCounter);
+
+  let firstWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+  console.log("First Word: " + firstWord);
+  let lastWord = firstWord;
+  let tweet = "";
+  let idea = firstWord;
+
+  while (ideaCounter > 0) {
+
+    // check for end of idea
     if (/[\.\?\!\#]/.test(lastWord) || eRegex.test(lastWord)) {
-      counter--;
-      console.log("Counter: ", counter + " LastWord:", lastWord);
-      if (counter <= 0) return newText;
+      if ((idea.length + tweet.length) < 280) {
+        tweet = tweet.concat(idea);
+        ideaCounter--;
+        console.log("Counter: ", ideaCounter + " LastWord:", lastWord);
+      }
+      lastWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+      console.log("New idea, first word: " + lastWord);
+      idea = " " + lastWord;
+
+      if (tweet.length >= 200) {
+        console.log("getting too long, RETURN");
+        return tweet;
+      }
     }
+
+    // pick and add new word to idea
     let lastWordArr = markovChain[lastWord];
     let nextWord = lastWordArr[Math.floor(Math.random() * lastWordArr.length)];
     let space = "";
     if ((nextWord) && ![".", ",", "!", "...", "?", ":"].includes(nextWord[0])) space = " ";
-    newText = newText.concat(space + nextWord);
+
+    idea = idea.concat(space + nextWord);
     lastWord = nextWord;
-    i++;
   }
-  return newText;
+  return tweet;
 }
 
 
