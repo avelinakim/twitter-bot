@@ -66,6 +66,9 @@ export function generateText(markovChain) {
     }
 
     // pick and add new word to idea
+    if (!markovChain[lastWord] || !markovChain[lastWord].length) {
+      lastWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+    }
     let lastWordArr = markovChain[lastWord];
     let nextWord = lastWordArr[Math.floor(Math.random() * lastWordArr.length)];
     let space = "";
