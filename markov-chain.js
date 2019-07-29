@@ -1,6 +1,7 @@
 import emojiRegex from 'emoji-regex'
 const eRegex = emojiRegex();
 
+// Helper Functions
 function prepareText(text) {
   let preparedText = text.replace(/\.\.\./g, " ...");
   preparedText = preparedText.replace(/([^\.])\. /g, '$1 . ');
@@ -11,6 +12,11 @@ function prepareText(text) {
   return preparedText;
 }
 
+function randomElement(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Generate Markov Chain
 export function generateMarkovChain(text, startWordsArr) {
   let preppedText = prepareText(text);
   const markovChain = { startWords: [] };
@@ -35,12 +41,14 @@ export function generateMarkovChain(text, startWordsArr) {
   return markovChain;
 }
 
+// Generate Tweet
 export function generateText(markovChain) {
   let probability = [1, 1, 2, 2, 2, 3];
-  let ideaCounter = probability[Math.floor(Math.random() * probability.length)];
+  let ideaCounter = randomElement(probability);
   console.log(ideaCounter);
 
-  let firstWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+  let startWords = markovChain.startWords;
+  let firstWord = randomElement(startWords);
   console.log("First Word: " + firstWord);
   let lastWord = firstWord;
   let tweet = "";
@@ -55,7 +63,7 @@ export function generateText(markovChain) {
         ideaCounter--;
         console.log("Counter: ", ideaCounter + " LastWord:", lastWord);
       }
-      lastWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+      lastWord = randomElement(startWords);
       console.log("New idea, first word: " + lastWord);
       idea = " " + lastWord;
 
@@ -67,10 +75,10 @@ export function generateText(markovChain) {
 
     // pick and add new word to idea
     if (!markovChain[lastWord] || !markovChain[lastWord].length) {
-      lastWord = markovChain.startWords[Math.floor(Math.random() * markovChain.startWords.length)];
+      lastWord = randomElement(startWords);
     }
     let lastWordArr = markovChain[lastWord];
-    let nextWord = lastWordArr[Math.floor(Math.random() * lastWordArr.length)];
+    let nextWord = randomElement(lastWordArr);
     let space = "";
     if ((nextWord) && ![".", ",", "!", "...", "?", ":"].includes(nextWord[0])) space = " ";
 
