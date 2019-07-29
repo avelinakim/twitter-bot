@@ -3,10 +3,7 @@ const eRegex = emojiRegex();
 
 // Helper Functions
 function prepareText(text) {
-  let preparedText = text.replace(/\.\.\./g, " ...");
-  preparedText = preparedText.replace(/([^\.])\. /g, '$1 . ');
-  preparedText = preparedText.replace(/([\.\?\!\:\"])$/g, ' $1');
-  preparedText = preparedText.replace(/([\,\.\?\!\:\"])(\s+)/g, ' $1$2');
+  let preparedText = text.replace(/(\.\.\.|\.|\,|[\?\!]+|\:|\")($|\s+)/g, " $1$2");
   preparedText = preparedText.replace(/[@"()]/g, '');
   preparedText = preparedText.replace(/&amp;/g, ' & ');
   return preparedText;
@@ -56,7 +53,7 @@ export function generateText(markovChain) {
 
   while (ideaCounter > 0) {
 
-    // check for end of idea
+    // Check for end of idea, concat, then start new idea or return tweet
     if (/[\.\?\!\#]/.test(lastWord) || eRegex.test(lastWord)) {
       if ((idea.length + tweet.length) < 280) {
         tweet = tweet.concat(idea);
@@ -73,9 +70,10 @@ export function generateText(markovChain) {
       }
     }
 
-    // pick and add new word to idea
+    // Determine and add new word to idea
     if (!markovChain[lastWord] || !markovChain[lastWord].length) {
       lastWord = randomElement(startWords);
+      idea = lastWord;
     }
     let lastWordArr = markovChain[lastWord];
     let nextWord = randomElement(lastWordArr);
