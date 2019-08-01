@@ -60,5 +60,4 @@ function postTweet() {
 }
 
 console.log(createTweet());
-setInterval(postTweet, 5000);
-  //postTweet();
+postTweet();
