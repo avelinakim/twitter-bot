@@ -14,5 +14,8 @@
     "emoji-regex": "^8.0.0",
     "twitter": "^1.7.1"
   },
+  "engines": {
+    "node": "12.x"
+  },
   "type": "module"
 }
