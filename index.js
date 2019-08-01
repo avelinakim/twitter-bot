@@ -19,6 +19,7 @@ const params = {
 
 client.get('search/tweets', params, (error, tweetsObj, response) => {
   if (!error) {
+    console.log("Got the TWEETS")
     let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
     let tweetsArr = tweetsObj.statuses;
     for (let tweet of tweetsArr) {
@@ -59,4 +60,5 @@ function postTweet() {
 }
 
 console.log(createTweet());
-//postTweet();
+setInterval(postTweet, 5000);
+  //postTweet();
