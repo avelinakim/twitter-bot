@@ -2,17 +2,22 @@ import Twitter from 'twitter';
 import dotenv from 'dotenv';
 import { generateMarkovChain, generateText } from "./markov-chain.js"
 import * as fs from 'fs';
+import admin from 'firebase-admin';
 
-dotenv.config()
+dotenv.config();
 
-let twitterConfig = {
+const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG)
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseConfig)
+});
+let db = admin.firestore();
+
+const client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
   consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
   access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-}
-
-const client = new Twitter();
+});
 
 const params = {
   q: 'from:cigneutron',

@@ -12,6 +12,7 @@
   "dependencies": {
     "dotenv": "^8.0.0",
     "emoji-regex": "^8.0.0",
+    "firebase-admin": "^8.3.0",
     "twitter": "^1.7.1"
   },
   "engines": {
