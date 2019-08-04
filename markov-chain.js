@@ -29,12 +29,12 @@ export function generateMarkovChain(text, startWordsArr) {
     }
   }
   markovChain.startWords = [
-    ...markovChain.startWords,
-    ...markovChain['.'],
-    ...markovChain['!'],
-    ...markovChain['?'],
+    ...(markovChain.startWords || []),
+    ...(markovChain['.'] || []),
+    ...(markovChain['!'] || []),
+    ...(markovChain['?'] || []),
   ]
-  console.log("MarkovChain:", markovChain);
+  //console.log("MarkovChain:", markovChain);
   return markovChain;
 }
 

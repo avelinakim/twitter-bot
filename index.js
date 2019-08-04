@@ -2,15 +2,9 @@ import Twitter from 'twitter';
 import dotenv from 'dotenv';
 import { generateMarkovChain, generateText } from "./markov-chain.js"
 import * as fs from 'fs';
-import admin from 'firebase-admin';
+import { saveTweet, getTweets } from "./firebase.js"
 
 dotenv.config();
-
-const firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG)
-admin.initializeApp({
-  credential: admin.credential.cert(firebaseConfig)
-});
-let db = admin.firestore();
 
 const client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -33,6 +27,9 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
       if (!tweet.retweeted_status && !tweet.in_reply_to_status_id) {
         let tweetText = tweet.full_text + " ";
         let tweetID = tweet.id;
+        saveTweet(tweetID.toString(), tweetText);
+
+        // For text-data.json
         let tweetNotInData = tweetData.every((tweetObj) => tweetObj.id !== tweetID);
         if (tweetNotInData) {
           let newTweetObj = { text: tweetText, id: tweetID };
@@ -46,14 +43,14 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
   }
 });
 
-let startWords = [];
-function createTweet() {
-  startWords = [];
-  let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
+async function createTweet() {
+  let startWords = [];
+  let tweetData = await getTweets();
   let tweetText = tweetData.reduce((string, textObj) => {
     startWords.push((textObj.text).split(" ")[0]);
     return string + textObj.text + " ";
   }, "");
+
   let markovChain = generateMarkovChain(tweetText, startWords);
   let generatedTweet = generateText(markovChain);
   return generatedTweet;
@@ -66,5 +63,10 @@ function postTweet() {
   });
 }
 
-console.log(createTweet());
-postTweet();
+async function main() {
+  console.log(await createTweet());
+}
+
+main();
+
+//postTweet();
