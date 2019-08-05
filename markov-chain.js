@@ -34,7 +34,6 @@ export function generateMarkovChain(text, startWordsArr) {
     ...(markovChain['!'] || []),
     ...(markovChain['?'] || []),
   ]
-  //console.log("MarkovChain:", markovChain);
   return markovChain;
 }
 
@@ -42,11 +41,9 @@ export function generateMarkovChain(text, startWordsArr) {
 export function generateText(markovChain) {
   let probability = [1, 1, 2, 2, 2, 3];
   let ideaCounter = randomElement(probability);
-  console.log(ideaCounter);
 
   let startWords = markovChain.startWords;
   let firstWord = randomElement(startWords);
-  console.log("First Word: " + firstWord);
   let lastWord = firstWord;
   let tweet = "";
   let idea = firstWord;
@@ -58,14 +55,11 @@ export function generateText(markovChain) {
       if ((idea.length + tweet.length) < 280) {
         tweet = tweet.concat(idea);
         ideaCounter--;
-        console.log("Counter: ", ideaCounter + " LastWord:", lastWord);
       }
       lastWord = randomElement(startWords);
-      console.log("New idea, first word: " + lastWord);
       idea = " " + lastWord;
 
       if (tweet.length >= 200) {
-        console.log("getting too long, RETURN");
         return tweet;
       }
     }

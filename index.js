@@ -20,8 +20,7 @@ const params = {
 
 client.get('search/tweets', params, (error, tweetsObj, response) => {
   if (!error) {
-    console.log("Got the TWEETS")
-    let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
+    // let tweetData = JSON.parse(fs.readFileSync('text-data.json', 'utf8'));
     let tweetsArr = tweetsObj.statuses;
     for (let tweet of tweetsArr) {
       if (!tweet.retweeted_status && !tweet.in_reply_to_status_id) {
@@ -30,14 +29,14 @@ client.get('search/tweets', params, (error, tweetsObj, response) => {
         saveTweet(tweetID.toString(), tweetText);
 
         // For text-data.json
-        let tweetNotInData = tweetData.every((tweetObj) => tweetObj.id !== tweetID);
-        if (tweetNotInData) {
-          let newTweetObj = { text: tweetText, id: tweetID };
-          tweetData.push(newTweetObj);
-        }
+        // let tweetNotInData = tweetData.every((tweetObj) => tweetObj.id !== tweetID);
+        // if (tweetNotInData) {
+        //   let newTweetObj = { text: tweetText, id: tweetID };
+        //   tweetData.push(newTweetObj);
+        // }
       }
     }
-    fs.writeFileSync('text-data.json', JSON.stringify(tweetData, null, 2), 'utf8');
+    // fs.writeFileSync('text-data.json', JSON.stringify(tweetData, null, 2), 'utf8');
   } else {
     console.log('ERROR', error)
   }
@@ -56,17 +55,18 @@ async function createTweet() {
   return generatedTweet;
 }
 
-function postTweet() {
-  client.post('statuses/update', { status: createTweet() }, (error, tweet, response) => {
+async function postTweet(tweet) {
+  client.post('statuses/update', { status: tweet }, (error, tweet, response) => {
     if (error) throw error;
     console.log(tweet.text);
   });
 }
 
 async function main() {
-  console.log(await createTweet());
+  let tweet = await createTweet();
+  console.log(tweet);
+  postTweet(tweet);
 }
 
 main();
-
 //postTweet();
